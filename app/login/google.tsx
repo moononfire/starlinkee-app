@@ -21,25 +21,26 @@ function extractAccessToken(url: string): string | null {
 export default function GoogleSignInScreen() {
   const { returnTo } = useLocalSearchParams<{ returnTo?: string }>();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "browser" | "finishing">("idle");
   const [error, setError] = useState<string | null>(null);
+  const loading = status !== "idle";
 
   async function signIn() {
-    setLoading(true);
+    setStatus("browser");
     setError(null);
     const redirectUrl = Linking.createURL("login/callback");
     const authUrl = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectUrl)}`;
     const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
 
     if (result.type !== "success") {
-      setLoading(false);
+      setStatus("idle");
       setError("Logowanie zostało przerwane. Spróbuj ponownie.");
       return;
     }
 
+    setStatus("finishing");
     const accessToken = extractAccessToken(result.url);
     const emailRes = accessToken ? await getGoogleEmail(accessToken) : null;
-    setLoading(false);
 
     router.push({
       pathname: "/login/phone",
@@ -55,6 +56,8 @@ export default function GoogleSignInScreen() {
       <Pressable style={[styles.button, loading && styles.buttonDisabled]} onPress={signIn} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Zaloguj się przez Google</Text>}
       </Pressable>
+      {status === "browser" && <Text style={styles.statusText}>Otwieram logowanie Google w przeglądarce...</Text>}
+      {status === "finishing" && <Text style={styles.statusText}>Kończę logowanie...</Text>}
     </View>
   );
 }
@@ -67,4 +70,5 @@ const styles = StyleSheet.create({
   button: { backgroundColor: "#111827", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
   buttonDisabled: { opacity: 0.5 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  statusText: { fontSize: 14, color: "#6b7280", textAlign: "center" },
 });

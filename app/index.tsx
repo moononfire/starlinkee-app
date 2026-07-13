@@ -26,6 +26,7 @@ export default function HomeScreen() {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#111827" />
+        <Text style={styles.statusText}>Sprawdzam logowanie...</Text>
       </View>
     );
   }
@@ -47,6 +48,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#f9fafb", gap: 24 },
   title: { fontSize: 28, fontWeight: "700", color: "#111827" },
   subtitle: { fontSize: 16, color: "#4b5563", textAlign: "center", lineHeight: 22 },
+  statusText: { fontSize: 14, color: "#6b7280" },
   settingsButton: { paddingVertical: 10, paddingHorizontal: 20 },
   settingsButtonText: { fontSize: 15, color: "#6b7280", textDecorationLine: "underline" },
 });

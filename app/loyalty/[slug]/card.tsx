@@ -25,6 +25,7 @@ export default function CardScreen() {
   const [maxStamps, setMaxStamps] = useState(Number(maxStampsParam ?? 10));
   const [rewardReady, setRewardReady] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("Ładuję kartę...");
   const [error, setError] = useState<string | null>(null);
   const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
   const [claimed, setClaimed] = useState(false);
@@ -51,6 +52,7 @@ export default function CardScreen() {
       }
 
       if (scanToken) {
+        setLoadingMessage("Zbieram pieczątkę...");
         const res = await collectStamp(auth.token, slug, scanToken);
         if (res.status === 429 && res.data.error === "cooldown") {
           setCooldownSeconds(res.data.remaining_seconds ?? null);
@@ -68,6 +70,7 @@ export default function CardScreen() {
 
   async function onClaim() {
     if (!token || !slug) return;
+    setLoadingMessage("Odbieram nagrodę...");
     setLoading(true);
     const res = await claimReward(token, slug);
     setLoading(false);
@@ -81,6 +84,7 @@ export default function CardScreen() {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#111827" />
+        <Text style={styles.statusText}>{loadingMessage}</Text>
       </View>
     );
   }
@@ -143,4 +147,5 @@ const styles = StyleSheet.create({
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   cooldown: { color: "#d97706", fontSize: 14 },
   error: { color: "#ef4444", fontSize: 14, textAlign: "center" },
+  statusText: { fontSize: 14, color: "#6b7280" },
 });

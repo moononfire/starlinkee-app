@@ -38,6 +38,7 @@ export default function PhoneScreen() {
       <Pressable style={[styles.button, (!phone || loading) && styles.buttonDisabled]} onPress={submit} disabled={!phone || loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Wyślij kod SMS</Text>}
       </Pressable>
+      {loading && <Text style={styles.statusText}>Wysyłam kod SMS...</Text>}
     </View>
   );
 }
@@ -59,4 +60,5 @@ const styles = StyleSheet.create({
   button: { backgroundColor: "#111827", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
   buttonDisabled: { opacity: 0.5 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  statusText: { fontSize: 14, color: "#6b7280", textAlign: "center" },
 });

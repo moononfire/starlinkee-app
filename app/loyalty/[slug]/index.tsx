@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { getAuth } from "../../../lib/storage";
 
@@ -37,10 +37,12 @@ export default function LoyaltyEntryScreen() {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#111827" />
+      <Text style={styles.statusText}>Sprawdzam logowanie...</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#f9fafb" },
+  container: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#f9fafb", gap: 12 },
+  statusText: { fontSize: 14, color: "#6b7280" },
 });
