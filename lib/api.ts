@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://starlinkee.com";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://app.starlinkee.com";
 
 async function request<T>(path: string, options: RequestInit & { token?: string } = {}): Promise<{
   ok: boolean;
