@@ -4,26 +4,35 @@ Natywna aplikacja React Native (Expo) dla klientów końcowych.
 
 ## Jak to działa
 
-1. Klient stuka telefonem w nadajnik NFC przy kasie — **tak jak dziś**,
-   otwiera się strona w przeglądarce (`starlinkee.com/plate/...` → karta
-   lojalnościowa pod `/l/{slug}/loyalty`). To się nie zmienia.
-2. Na tej stronie jest przycisk **„Otwórz w aplikacji Starlinkee”**
-   (widoczny tylko na Androidzie — `src/components/linktree/LoyaltyCard.tsx`
-   w repo `starlinkee-v2`). Kliknięcie:
-   - jeśli appka jest zainstalowana → otwiera ją przez custom scheme
-     `starlinkee://loyalty/{slug}?scanToken=...&maxStamps=...` i appka sama
-     bije pieczątkę (scanToken z web-flow jest dowodem świeżej wizyty,
-     ważny 2 minuty);
-   - jeśli appka nie jest zainstalowana → Chrome automatycznie przechodzi
-     na stronę Google Play (`S.browser_fallback_url` w linku `intent://`).
-3. Appka nie musi sama nic wiedzieć o tagach NFC ani sekretach płytek —
-   cała ta walidacja już zaszła na serwerze, zanim użytkownik kliknął
-   przycisk. Appka dostaje gotowy `scanToken` i tylko go zużywa przez
-   `POST /api/mobile/loyalty/collect`.
+Logowanie jest **globalne dla całej appki**, nie per lokalizacja: Google
+Sign-In (krok tylko w UI, bez wpływu na backend) → numer telefonu → kod SMS
+raz, a wynikowa sesja działa potem automatycznie w każdej odwiedzonej
+lokalizacji. Numer telefonu (nie konto Google) jest jedynym identyfikatorem
+karty lojalnościowej w bazie.
 
-Backend (API, baza danych, logika 12h/OTP) to istniejący projekt
-`starlinkee-v2` — ta appka jest tylko klientem wołającym jego endpointy pod
-`/api/mobile/loyalty/*`.
+1. Klient stuka telefonem w nadajnik NFC przy kasie — otwiera się strona w
+   przeglądarce (`starlinkee.com/plate/...` → karta lojalnościowa pod
+   `/l/{slug}/loyalty`, projekt `starlinkee-v2`).
+2. Ta strona to już tylko most do appki (`src/components/linktree/LoyaltyCard.tsx`
+   w `starlinkee-v2`) — na Androidzie **automatycznie** przekierowuje przez
+   `intent://loyalty/{slug}?scanToken=...&maxStamps=...`:
+   - appka zainstalowana → otwiera się i sama bije pieczątkę (scanToken jest
+     dowodem świeżej wizyty, ważny kilka minut) przez
+     `POST /api/mobile/loyalty/collect`;
+   - appka niezainstalowana → Chrome przechodzi na
+     `starlinkee.com/{lang}/pobierz-aplikacje` (nasza własna strona z plikiem
+     `.apk` — appka nie jest jeszcze w Google Play), gdzie trzeba ją pobrać i
+     **przyłożyć telefon do nadajnika jeszcze raz** po instalacji (sideload
+     nie ma deferred deep linkingu, to wymaga Play Install Referrer API).
+   - iOS: bez automatycznego przekierowania (custom scheme bez appki
+     pokazuje twardy błąd w Safari) — tylko widoczny przycisk.
+3. Appka nie musi sama nic wiedzieć o tagach NFC ani sekretach płytek —
+   cała ta walidacja już zaszła na serwerze. Appka dostaje gotowy `scanToken`
+   i tylko go zużywa.
+
+Backend (API, baza danych, logika 12h/OTP, tabela `loyalty_cards` kluczowana
+numerem telefonu) to istniejący projekt `starlinkee-v2` — ta appka jest
+tylko klientem wołającym jego endpointy pod `/api/mobile/loyalty/*`.
 
 ## Wymagania
 
@@ -65,6 +74,47 @@ kliknąć przycisk na realnej stronie `/l/{slug}/loyalty?scan=...`).
 Domyślny adres API jest w `.env` (`EXPO_PUBLIC_API_BASE_URL`). Do testów
 lokalnego serwera Next.js (np. przez `ngrok`), utwórz `.env.local` z inną
 wartością — nadpisuje `.env`, nie trafia do gita.
+
+## Aktualizacje OTA (EAS Update) — bez ponownej instalacji appki
+
+Zmiany czysto w kodzie JS/TS (bez nowych zależności natywnych, bez zmian w
+`app.json`) można wypchnąć na telefony, które już mają appkę zainstalowaną,
+bez budowania nowego `.apk`/`.aab` i bez reinstalacji:
+
+```
+npx eas-cli@latest update --channel preview --environment preview --message "opis zmiany"
+```
+
+Kilka rzeczy, które trzeba rozumieć, żeby to zadziałało:
+
+- **`eas update` zawsze publikuje do chmury Expo** — nieważne, czy sama
+  appka na telefonie została zbudowana lokalnie (`gradlew`/`expo run:android`)
+  czy przez `eas build`. To dwie niezależne rzeczy: **jak appka powstała**
+  (build) i **skąd bierze nowe wersje JS** (update).
+- Żeby appka w ogóle wiedziała, na jakim kanale ma sprawdzać aktualizacje,
+  musi mieć to zaszyte w natywnym manifeście (`expo-channel-name`). `eas
+  build` robi to automatycznie na podstawie pola `channel` w `eas.json` dla
+  danego profilu. **Bare `expo prebuild` + `gradlew`/Android Studio (bez
+  `eas build`) tego nie robi samo z siebie** — dlatego w `app.json` jest na
+  stałe wpisane:
+  ```json
+  "updates": {
+    "requestHeaders": { "expo-channel-name": "preview" }
+  }
+  ```
+  Dzięki temu **każdy** build (lokalny i przez EAS) dostaje ten sam kanał
+  zaszyty przy `expo prebuild`. Jeśli kiedyś dojdzie profil `production` z
+  innym kanałem, trzeba to tu zaktualizować (albo usunąć na stałe wpisany
+  nagłówek i polegać wyłącznie na `eas build`, które ustawia go samo).
+- Build zrobiony **zanim** ten wpis w `app.json` się pojawił (albo w ogóle
+  bez `expo-updates` w zależnościach) **nie odbierze żadnej aktualizacji
+  OTA** — nie ma czego sprawdzić. Jedyny sposób, żeby taki egzemplarz dostał
+  nowszy kod, to zbudować i zainstalować go ponownie.
+- Sprawdzić, czy dany `.apk`/`.aab` ma poprawnie zaszyty kanał, można przez:
+  ```
+  grep expo-channel-name android/app/src/main/AndroidManifest.xml
+  ```
+  (po `expo prebuild`, przed spakowaniem do `.apk`).
 
 ---
 
@@ -182,16 +232,22 @@ npx eas-cli@latest build --platform android --profile preview
 
 ```
 app/
-  index.tsx                      — ekran startowy appki
-  loyalty/[slug]/index.tsx       — cel deep linku z przycisku na stronie
-                                    web; decyduje phone vs. card
-  loyalty/[slug]/phone.tsx       — logowanie: numer telefonu
-  loyalty/[slug]/otp.tsx         — logowanie: kod SMS
+  index.tsx                      — ekran startowy: numer telefonu +
+                                    lista odwiedzonych lokalizacji z
+                                    liczbą pieczątek (GET .../cards)
+  settings.tsx                   — numer telefonu, wylogowanie
+  login/google.tsx               — logowanie: Google Sign-In (krok UI,
+                                    email tylko zapisywany, nie wymuszany)
+  login/phone.tsx                — logowanie: numer telefonu
+  login/otp.tsx                  — logowanie: kod SMS, zapisuje globalną
+                                    sesję (nie per lokalizacja)
+  loyalty/[slug]/index.tsx       — cel deep linku z NFC; decyduje
+                                    login vs. prosto do karty
   loyalty/[slug]/card.tsx        — karta lojalnościowa, bicie pieczątki,
                                     odbiór nagrody
 lib/api.ts                       — klient API (fetch + Bearer token)
-lib/storage.ts                   — SecureStore, token/telefon per lokal
-                                    (jedna appka obsługuje wiele lokali)
+lib/storage.ts                   — SecureStore, jedna globalna sesja
+                                    (token + telefon) dla całej appki
 ```
 
 ## Co dalej (poza obecnym zakresem)
