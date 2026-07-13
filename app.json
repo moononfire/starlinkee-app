@@ -2,6 +2,7 @@
   "expo": {
     "name": "Starlinkee",
     "slug": "starlinkee-app",
+    "owner": "moononfire",
     "scheme": "starlinkee",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,6 +26,16 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-router", "expo-secure-store", "expo-web-browser"]
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c85f67bc-431f-42ce-b0ba-ae2f0cf69fca"
+      }
+    }
   }
 }

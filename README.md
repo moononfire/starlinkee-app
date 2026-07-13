@@ -108,9 +108,18 @@ Zgodnie z tym, co appka faktycznie zbiera:
 
 ### 4. Budowanie i podpisywanie (EAS — już skonfigurowane w `eas.json`)
 
+`eas-cli` celowo **nie jest** zależnością projektu (`package.json`) —
+dodanie go tam wciąga zależności kolidujące z `expo-router` i psuje
+`npm ci`, którego używa serwer budujący EAS. Uruchamiaj go zawsze przez
+`npx eas-cli@latest <komenda>` (npx pobiera go doraźnie, nic nie zapisuje w
+projekcie). Sam `npx eas ...` (bez `-cli`) zwróci błąd
+`npm error could not determine executable to run` — npx szuka wtedy pakietu
+o nazwie dokładnie "eas", którego nie ma; właściwy pakiet nazywa się
+`eas-cli`.
+
 ```
-npx eas login
-npx eas build --platform android --profile production
+npx eas-cli@latest login
+npx eas-cli@latest build --platform android --profile production
 ```
 
 To zbuduje plik `.aab` (wymagany przez Play, nie `.apk`) w chmurze Expo i
@@ -129,7 +138,7 @@ service account z rolą "Release manager", pobierz plik JSON, zapisz jako
 nigdy nie commituj tego pliku):
 
 ```
-npx eas submit --platform android --profile production
+npx eas-cli@latest submit --platform android --profile production
 ```
 
 ### 6. Wymóg testów zamkniętych (nowe konta deweloperskie)
@@ -166,7 +175,7 @@ testerom (nie klientom końcowym — tylko do wewnętrznych testów), pamiętaj�
 że pojawi się ostrzeżenie Play Protect przy instalacji spoza sklepu:
 
 ```
-npx eas build --platform android --profile preview
+npx eas-cli@latest build --platform android --profile preview
 ```
 
 ## Struktura
