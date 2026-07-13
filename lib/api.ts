@@ -60,3 +60,20 @@ export function getCard(token: string, slug: string) {
     { method: "GET", token }
   );
 }
+
+export interface LoyaltyCardSummary {
+  slug: string | null;
+  location_name: string;
+  logo_link: string | null;
+  stamps: number;
+  max_stamps: number;
+  reward_ready: boolean;
+  last_stamp_at: string | null;
+}
+
+export function getMyCards(token: string) {
+  return request<{ phone: string; cards: LoyaltyCardSummary[] }>("/api/mobile/loyalty/cards", {
+    method: "GET",
+    token,
+  });
+}
