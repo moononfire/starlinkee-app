@@ -1,43 +1,29 @@
 import * as SecureStore from "expo-secure-store";
 
-// Loyalty sessions are stored per-location because a single customer can
-// hold cards at many different venues that all use this one app.
-interface LocationAuth {
+// Login (Google, then phone/SMS OTP) is one-time and app-wide — the phone
+// number is the account, not a per-location card registration. The same
+// session works for every location's loyalty card.
+export interface Auth {
   token: string;
   phone: string;
 }
 
-type AuthMap = Record<string, LocationAuth>;
+const STORAGE_KEY = "starlinkee_auth";
 
-const STORAGE_KEY = "starlinkee_loyalty_auth";
-
-async function readAll(): Promise<AuthMap> {
+export async function getAuth(): Promise<Auth | null> {
   const raw = await SecureStore.getItemAsync(STORAGE_KEY);
-  if (!raw) return {};
+  if (!raw) return null;
   try {
-    return JSON.parse(raw) as AuthMap;
+    return JSON.parse(raw) as Auth;
   } catch {
-    return {};
+    return null;
   }
 }
 
-async function writeAll(map: AuthMap): Promise<void> {
-  await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(map));
+export async function setAuth(auth: Auth): Promise<void> {
+  await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(auth));
 }
 
-export async function getLocationAuth(slug: string): Promise<LocationAuth | null> {
-  const map = await readAll();
-  return map[slug] ?? null;
-}
-
-export async function setLocationAuth(slug: string, auth: LocationAuth): Promise<void> {
-  const map = await readAll();
-  map[slug] = auth;
-  await writeAll(map);
-}
-
-export async function clearLocationAuth(slug: string): Promise<void> {
-  const map = await readAll();
-  delete map[slug];
-  await writeAll(map);
+export async function clearAuth(): Promise<void> {
+  await SecureStore.deleteItemAsync(STORAGE_KEY);
 }

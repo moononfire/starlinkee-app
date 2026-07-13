@@ -10,9 +10,11 @@ export default function RootLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: "Starlinkee" }} />
+      <Stack.Screen name="settings" options={{ title: "Ustawienia" }} />
+      <Stack.Screen name="login/google" options={{ title: "Logowanie", headerShown: false }} />
+      <Stack.Screen name="login/phone" options={{ title: "Twój numer" }} />
+      <Stack.Screen name="login/otp" options={{ title: "Kod SMS" }} />
       <Stack.Screen name="loyalty/[slug]/index" options={{ title: "Karta lojalnościowa" }} />
-      <Stack.Screen name="loyalty/[slug]/phone" options={{ title: "Twoja karta" }} />
-      <Stack.Screen name="loyalty/[slug]/otp" options={{ title: "Kod SMS" }} />
       <Stack.Screen name="loyalty/[slug]/card" options={{ title: "Karta lojalnościowa" }} />
     </Stack>
   );

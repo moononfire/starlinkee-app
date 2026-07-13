@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { collectStamp, claimReward, getCard } from "../../../lib/api";
-import { getLocationAuth, clearLocationAuth } from "../../../lib/storage";
+import { getAuth } from "../../../lib/storage";
 
 function formatRemaining(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -35,19 +35,15 @@ export default function CardScreen() {
 
     (async () => {
       if (!slug) return;
-      const auth = await getLocationAuth(slug);
+      const auth = await getAuth();
       if (!auth) {
-        router.replace({ pathname: "/loyalty/[slug]/phone", params: { slug, scanToken: scanToken ?? "" } });
+        const returnTo = `/loyalty/${slug}/card?scanToken=${encodeURIComponent(scanToken ?? "")}&maxStamps=${encodeURIComponent(maxStampsParam ?? "10")}`;
+        router.replace({ pathname: "/login/google", params: { returnTo } });
         return;
       }
       setToken(auth.token);
 
-      const cardRes = await getCard(auth.token);
-      if (cardRes.status === 401) {
-        await clearLocationAuth(slug);
-        router.replace({ pathname: "/loyalty/[slug]/phone", params: { slug, scanToken: scanToken ?? "" } });
-        return;
-      }
+      const cardRes = await getCard(auth.token, slug);
       if (cardRes.ok) {
         setStamps(cardRes.data.stamps);
         setRewardReady(cardRes.data.reward_ready);
@@ -55,7 +51,7 @@ export default function CardScreen() {
       }
 
       if (scanToken) {
-        const res = await collectStamp(auth.token, scanToken);
+        const res = await collectStamp(auth.token, slug, scanToken);
         if (res.status === 429 && res.data.error === "cooldown") {
           setCooldownSeconds(res.data.remaining_seconds ?? null);
         } else if (res.status === 403) {
@@ -68,12 +64,12 @@ export default function CardScreen() {
 
       setLoading(false);
     })();
-  }, [slug, scanToken, router]);
+  }, [slug, scanToken, maxStampsParam, router]);
 
   async function onClaim() {
-    if (!token) return;
+    if (!token || !slug) return;
     setLoading(true);
-    const res = await claimReward(token);
+    const res = await claimReward(token, slug);
     setLoading(false);
     if (!res.ok) return;
     setClaimed(true);
