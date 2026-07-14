@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator, FlatList, Image, 
 import { useRouter, useFocusEffect } from "expo-router";
 import { getAuth } from "../lib/storage";
 import { getMyCards, LoyaltyCardSummary } from "../lib/api";
+import { Colors, Radius } from "../constants/theme";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function HomeScreen() {
   if (checking) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#111827" />
+        <ActivityIndicator size="large" color={Colors.brand600} />
         <Text style={styles.statusText}>Sprawdzam logowanie...</Text>
       </View>
     );
@@ -70,14 +71,14 @@ export default function HomeScreen() {
       <View style={styles.listSection}>
         <Text style={styles.listTitle}>Twoje karty lojalnościowe</Text>
         {loadingCards ? (
-          <ActivityIndicator color="#111827" style={{ marginTop: 16 }} />
+          <ActivityIndicator color={Colors.brand600} style={{ marginTop: 16 }} />
         ) : cards.length === 0 ? (
           <Text style={styles.emptyText}>Nie masz jeszcze żadnej karty. Zbierz pierwszą pieczątkę w lokalu.</Text>
         ) : (
           <FlatList
             data={cards}
             keyExtractor={(item, i) => item.slug ?? String(i)}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadCards(true)} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadCards(true)} tintColor={Colors.brand600} />}
             renderItem={({ item }) => (
               <View style={styles.card}>
                 {item.logo_link ? (
@@ -105,32 +106,37 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#f9fafb", gap: 12 },
-  screen: { flex: 1, backgroundColor: "#f9fafb", padding: 24, gap: 16 },
+  container: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: Colors.background, gap: 12 },
+  screen: { flex: 1, backgroundColor: Colors.background, padding: 24, gap: 16 },
   header: { gap: 6 },
-  title: { fontSize: 28, fontWeight: "700", color: "#111827" },
-  subtitle: { fontSize: 15, color: "#111827", fontWeight: "600" },
-  hint: { fontSize: 14, color: "#4b5563", lineHeight: 20 },
-  statusText: { fontSize: 14, color: "#6b7280" },
+  title: { fontSize: 28, fontWeight: "700", color: Colors.brand600, letterSpacing: -0.5 },
+  subtitle: { fontSize: 15, color: Colors.textPrimary, fontWeight: "600" },
+  hint: { fontSize: 14, color: Colors.textSecondary, lineHeight: 20 },
+  statusText: { fontSize: 14, color: Colors.textMuted },
   listSection: { flex: 1, gap: 8 },
-  listTitle: { fontSize: 16, fontWeight: "600", color: "#111827" },
-  emptyText: { fontSize: 14, color: "#6b7280", marginTop: 8 },
+  listTitle: { fontSize: 16, fontWeight: "600", color: Colors.textPrimary },
+  emptyText: { fontSize: 14, color: Colors.textMuted, marginTop: 8 },
   card: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: Colors.white,
+    borderRadius: Radius.xxl,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: Colors.border,
     padding: 12,
     marginBottom: 8,
+    shadowColor: "#111827",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  logo: { width: 44, height: 44, borderRadius: 10 },
-  logoPlaceholder: { backgroundColor: "#e5e7eb" },
+  logo: { width: 44, height: 44, borderRadius: Radius.lg },
+  logoPlaceholder: { backgroundColor: Colors.border },
   cardInfo: { flex: 1 },
-  cardName: { fontSize: 15, fontWeight: "600", color: "#111827" },
-  cardStamps: { fontSize: 13, color: "#6b7280", marginTop: 2 },
+  cardName: { fontSize: 15, fontWeight: "600", color: Colors.textPrimary },
+  cardStamps: { fontSize: 13, color: Colors.textMuted, marginTop: 2 },
   settingsButton: { alignSelf: "center", paddingVertical: 10, paddingHorizontal: 20 },
-  settingsButtonText: { fontSize: 15, color: "#6b7280", textDecorationLine: "underline" },
+  settingsButtonText: { fontSize: 15, color: Colors.brand600, fontWeight: "500" },
 });

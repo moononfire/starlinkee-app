@@ -1,10 +1,11 @@
 import { Stack } from "expo-router";
+import { Colors } from "../constants/theme";
 
 export default function RootLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: "#111827" },
+        headerStyle: { backgroundColor: Colors.brand600 },
         headerTintColor: "#fff",
         headerTitleStyle: { fontWeight: "600" },
       }}
@@ -16,6 +17,7 @@ export default function RootLayout() {
       <Stack.Screen name="login/otp" options={{ title: "Kod SMS" }} />
       <Stack.Screen name="loyalty/[slug]/index" options={{ title: "Karta lojalnościowa" }} />
       <Stack.Screen name="loyalty/[slug]/card" options={{ title: "Karta lojalnościowa" }} />
+      <Stack.Screen name="loyalty/[slug]/redeem" options={{ title: "Odbiór nagrody" }} />
     </Stack>
   );
 }

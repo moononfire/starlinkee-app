@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { getAuth } from "../../../lib/storage";
+import { Colors } from "../../../constants/theme";
 
 // Entry point for the "Otwórz w aplikacji" button on the web loyalty page —
 // reached via the starlinkee://loyalty/{slug}?scanToken=...&maxStamps=...
@@ -36,13 +37,13 @@ export default function LoyaltyEntryScreen() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#111827" />
+      <ActivityIndicator size="large" color={Colors.brand600} />
       <Text style={styles.statusText}>Sprawdzam logowanie...</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#f9fafb", gap: 12 },
-  statusText: { fontSize: 14, color: "#6b7280" },
+  container: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: Colors.background, gap: 12 },
+  statusText: { fontSize: 14, color: Colors.textMuted },
 });

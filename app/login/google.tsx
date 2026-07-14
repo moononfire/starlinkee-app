@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { getGoogleEmail } from "../../lib/api";
+import { Colors, Radius, brandShadow } from "../../constants/theme";
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 
@@ -50,6 +51,7 @@ export default function GoogleSignInScreen() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.brand}>Starlinkee</Text>
       <Text style={styles.title}>Witaj w Starlinkee</Text>
       <Text style={styles.label}>Zaloguj się przez Google, żeby założyć konto w aplikacji.</Text>
       {error && <Text style={styles.error}>{error}</Text>}
@@ -63,12 +65,13 @@ export default function GoogleSignInScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 16, backgroundColor: "#f9fafb", justifyContent: "center" },
-  title: { fontSize: 22, fontWeight: "700", color: "#111827", textAlign: "center" },
-  label: { fontSize: 15, color: "#374151", textAlign: "center" },
-  error: { color: "#ef4444", fontSize: 14, textAlign: "center" },
-  button: { backgroundColor: "#111827", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
+  container: { flex: 1, padding: 24, gap: 16, backgroundColor: Colors.background, justifyContent: "center" },
+  brand: { fontSize: 20, fontWeight: "700", color: Colors.brand600, textAlign: "center", marginBottom: 4 },
+  title: { fontSize: 22, fontWeight: "700", color: Colors.textPrimary, textAlign: "center" },
+  label: { fontSize: 15, color: Colors.textSecondary, textAlign: "center" },
+  error: { color: Colors.error, fontSize: 14, textAlign: "center" },
+  button: { backgroundColor: Colors.brand600, borderRadius: Radius.xl, paddingVertical: 14, alignItems: "center", ...brandShadow },
   buttonDisabled: { opacity: 0.5 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  statusText: { fontSize: 14, color: "#6b7280", textAlign: "center" },
+  statusText: { fontSize: 14, color: Colors.textMuted, textAlign: "center" },
 });

@@ -11,6 +11,7 @@
     "expo-status-bar": "~57.0.0",
     "expo-updates": "~57.0.6",
     "expo-web-browser": "~57.0.0",
+    "phone-number-hint": "file:./modules/phone-number-hint",
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-safe-area-context": "~5.7.0",

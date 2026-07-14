@@ -3,6 +3,7 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-nati
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { collectStamp, claimReward, getCard } from "../../../lib/api";
 import { getAuth } from "../../../lib/storage";
+import { Colors, Radius, brandShadow } from "../../../constants/theme";
 
 function formatRemaining(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -28,7 +29,6 @@ export default function CardScreen() {
   const [loadingMessage, setLoadingMessage] = useState("Ładuję kartę...");
   const [error, setError] = useState<string | null>(null);
   const [cooldownSeconds, setCooldownSeconds] = useState<number | null>(null);
-  const [claimed, setClaimed] = useState(false);
 
   useEffect(() => {
     if (ranOnce.current) return;
@@ -49,6 +49,16 @@ export default function CardScreen() {
         setStamps(cardRes.data.stamps);
         setRewardReady(cardRes.data.reward_ready);
         setMaxStamps(cardRes.data.max_stamps);
+
+        // A code was already generated (app relaunched/refreshed mid-window)
+        // — resume the countdown screen instead of showing "odbierz" again.
+        if (cardRes.data.redeem) {
+          router.replace({
+            pathname: "/loyalty/[slug]/redeem",
+            params: { slug, code: cardRes.data.redeem.code, expiresAt: cardRes.data.redeem.expires_at },
+          });
+          return;
+        }
       }
 
       if (scanToken) {
@@ -74,16 +84,17 @@ export default function CardScreen() {
     setLoading(true);
     const res = await claimReward(token, slug);
     setLoading(false);
-    if (!res.ok) return;
-    setClaimed(true);
-    setStamps(0);
-    setRewardReady(false);
+    if (!res.ok || !res.data.code || !res.data.expires_at) return;
+    router.push({
+      pathname: "/loyalty/[slug]/redeem",
+      params: { slug, code: res.data.code, expiresAt: res.data.expires_at },
+    });
   }
 
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#111827" />
+        <ActivityIndicator size="large" color={Colors.brand600} />
         <Text style={styles.statusText}>{loadingMessage}</Text>
       </View>
     );
@@ -91,12 +102,6 @@ export default function CardScreen() {
 
   return (
     <View style={styles.container}>
-      {claimed && (
-        <View style={styles.banner}>
-          <Text style={styles.bannerText}>Nagroda odebrana! 🎉</Text>
-        </View>
-      )}
-
       <View style={styles.grid}>
         {Array.from({ length: maxStamps }, (_, i) => (
           <View key={i} style={[styles.stamp, i < stamps && styles.stampFilled]}>
@@ -125,27 +130,25 @@ export default function CardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 20, backgroundColor: "#f9fafb", alignItems: "center", justifyContent: "center" },
-  banner: { backgroundColor: "#dcfce7", borderRadius: 12, padding: 16, width: "100%" },
-  bannerText: { color: "#166534", fontSize: 15, textAlign: "center" },
+  container: { flex: 1, padding: 24, gap: 20, backgroundColor: Colors.background, alignItems: "center", justifyContent: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12, justifyContent: "center", maxWidth: 320 },
   stamp: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: Radius.full,
     borderWidth: 2,
-    borderColor: "#d1d5db",
+    borderColor: Colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
   },
-  stampFilled: { backgroundColor: "#111827", borderColor: "#111827" },
+  stampFilled: { backgroundColor: Colors.brand600, borderColor: Colors.brand600 },
   stampText: { fontSize: 18, color: "transparent" },
   stampTextFilled: { color: "#fff" },
-  count: { fontSize: 15, color: "#4b5563" },
-  button: { borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32, alignItems: "center" },
-  buttonReward: { backgroundColor: "#16a34a" },
+  count: { fontSize: 15, color: Colors.textSecondary },
+  button: { borderRadius: Radius.xl, paddingVertical: 14, paddingHorizontal: 32, alignItems: "center" },
+  buttonReward: { backgroundColor: Colors.success },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  cooldown: { color: "#d97706", fontSize: 14 },
-  error: { color: "#ef4444", fontSize: 14, textAlign: "center" },
-  statusText: { fontSize: 14, color: "#6b7280" },
+  cooldown: { color: Colors.warning, fontSize: 14 },
+  error: { color: Colors.error, fontSize: 14, textAlign: "center" },
+  statusText: { fontSize: 14, color: Colors.textMuted },
 });

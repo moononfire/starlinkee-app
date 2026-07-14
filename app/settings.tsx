@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
 import { getAuth, clearAuth } from "../lib/storage";
+import { Colors, Radius } from "../constants/theme";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       {loadingPhone ? (
-        <ActivityIndicator color="#111827" />
+        <ActivityIndicator color={Colors.brand600} />
       ) : (
         phone && (
           <View style={styles.row}>
@@ -43,11 +44,11 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 16, backgroundColor: "#f9fafb" },
-  row: { backgroundColor: "#fff", borderRadius: 12, padding: 16, borderWidth: 1, borderColor: "#e5e7eb", gap: 4 },
-  rowLabel: { fontSize: 13, color: "#6b7280" },
-  rowValue: { fontSize: 16, color: "#111827", fontWeight: "600" },
-  button: { backgroundColor: "#ef4444", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
+  container: { flex: 1, padding: 24, gap: 16, backgroundColor: Colors.background },
+  row: { backgroundColor: Colors.white, borderRadius: Radius.xxl, padding: 16, borderWidth: 1, borderColor: Colors.border, gap: 4 },
+  rowLabel: { fontSize: 13, color: Colors.textMuted },
+  rowValue: { fontSize: 16, color: Colors.textPrimary, fontWeight: "600" },
+  button: { backgroundColor: Colors.error, borderRadius: Radius.xl, paddingVertical: 14, alignItems: "center" },
   buttonDisabled: { opacity: 0.5 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

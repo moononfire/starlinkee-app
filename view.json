@@ -1,0 +1,48 @@
+{
+  "id": "a324b04c-72ec-4d73-a687-67effdd247c9",
+  "status": "ERRORED",
+  "platform": "ANDROID",
+  "error": {
+    "errorCode": "UNKNOWN_ERROR",
+    "message": "Unknown error. See logs of the Install dependencies build phase for more information."
+  },
+  "artifacts": {},
+  "fingerprint": {
+    "id": "019f5916-6e54-7edc-a438-c01295aac5a2",
+    "hash": "4e6a927b2a0495ce702b21a244eb9be41c05816c"
+  },
+  "initiatingActor": {
+    "id": "482ad5c9-47e7-4ae5-97e9-bb4b06fa93b1",
+    "displayName": "moononfire"
+  },
+  "logFiles": [
+    "https://storage.googleapis.com/eas-workflows-production/logs/c85f67bc-431f-42ce-b0ba-ae2f0cf69fca/a324b04c-72ec-4d73-a687-67effdd247c9/2026-07-13T01%3A27%3A53Z-394c9f8b-8110-490c-a9ca-b37fb894e166.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260713%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260713T012916Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=123ac377936589631c8842e8208f99e1dd327693225197fc84c7c33a8e85e17b22164be45d7f7498b767c66ab0e80247a39915bb4b04c440cc7a6cbef638d5d0f467f6660c87ac62c51dbe4000ce6cd5c6f23beeb2a93e0ff4fbcf953108f5d92bcf5574466d40a68a22811a97f306e952601204b71b78d66860da5c01e1a2e97b177c917b3b85e33e1a331a146f8a98c347b59e3cf5f5ac49f8e86a5db9f138602b2015a01d5c8bfa22227cfb3f7d11584e42cac169493faad7332349fda6bc82d0d6b6e42dd0c6ccf5d36cc071f44b7640c7428ed22b4ddf1020f356550954bc3325ffe96965aac17f7ba0da7b33f6d3c19e2e00d329059c363cd79d9e4872"
+  ],
+  "project": {
+    "id": "c85f67bc-431f-42ce-b0ba-ae2f0cf69fca",
+    "name": "starlinkee-app",
+    "slug": "starlinkee-app",
+    "ownerAccount": {
+      "id": "07060f1a-927f-42df-9ba2-e25b2721a499",
+      "name": "moononfire"
+    }
+  },
+  "distribution": "INTERNAL",
+  "buildProfile": "preview",
+  "sdkVersion": "57.0.0",
+  "appVersion": "1.0.0",
+  "appBuildVersion": "1",
+  "gitCommitHash": "ceb58d5ded612764b2ebb1e1285519f0382fc0c2",
+  "gitCommitMessage": "x",
+  "priority": "NORMAL_PLUS",
+  "createdAt": "2026-07-13T01:27:50.066Z",
+  "updatedAt": "2026-07-13T01:28:08.081Z",
+  "completedAt": "2026-07-13T01:28:07.874Z",
+  "expirationDate": "2026-07-27T01:27:50.091Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 3093,
+    "buildQueueTime": 4512,
+    "buildDuration": 10203
+  }
+}

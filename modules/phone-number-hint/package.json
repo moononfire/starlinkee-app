@@ -1,0 +1,9 @@
+{
+  "name": "phone-number-hint",
+  "version": "1.0.0",
+  "description": "Local Expo module wrapping Android's Phone Number Hint API (Google Identity Services) so the app can pick a SIM-based phone number without sending an SMS OTP.",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "UNLICENSED",
+  "private": true
+}

@@ -3,6 +3,7 @@ import { View, Text, TextInput, Pressable, StyleSheet, ActivityIndicator } from 
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { verifyOtp } from "../../lib/api";
 import { setAuth } from "../../lib/storage";
+import { Colors, Radius, brandShadow } from "../../constants/theme";
 
 export default function OtpScreen() {
   const { phone, returnTo, email } = useLocalSearchParams<{ phone: string; returnTo?: string; email?: string }>();
@@ -31,7 +32,7 @@ export default function OtpScreen() {
       <TextInput
         style={styles.input}
         placeholder="1234"
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor={Colors.textPlaceholder}
         keyboardType="number-pad"
         maxLength={4}
         value={code}
@@ -51,23 +52,23 @@ export default function OtpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 16, backgroundColor: "#f9fafb" },
-  label: { fontSize: 15, color: "#374151" },
+  container: { flex: 1, padding: 24, gap: 16, backgroundColor: Colors.background },
+  label: { fontSize: 15, color: Colors.textSecondary },
   input: {
     borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 12,
+    borderColor: Colors.borderStrong,
+    borderRadius: Radius.xl,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 22,
     letterSpacing: 8,
     textAlign: "center",
-    color: "#111827",
-    backgroundColor: "#fff",
+    color: Colors.textPrimary,
+    backgroundColor: Colors.white,
   },
-  error: { color: "#ef4444", fontSize: 14 },
-  button: { backgroundColor: "#111827", borderRadius: 12, paddingVertical: 14, alignItems: "center" },
+  error: { color: Colors.error, fontSize: 14 },
+  button: { backgroundColor: Colors.brand600, borderRadius: Radius.xl, paddingVertical: 14, alignItems: "center", ...brandShadow },
   buttonDisabled: { opacity: 0.5 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  statusText: { fontSize: 14, color: "#6b7280", textAlign: "center" },
+  statusText: { fontSize: 14, color: Colors.textMuted, textAlign: "center" },
 });

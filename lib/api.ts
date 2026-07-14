@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://app.starlinkee.com";
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "https://app.starlinkee.com";
 
 async function request<T>(path: string, options: RequestInit & { token?: string } = {}): Promise<{
   ok: boolean;
@@ -32,6 +32,15 @@ export function verifyOtp(phone: string, code: string, email?: string) {
   });
 }
 
+// Android-only: logs in with a phone number picked via the on-device Phone
+// Number Hint API, skipping SMS OTP entirely (no ownership verification).
+export function phoneHintLogin(phone: string) {
+  return request<{ ok?: true; token?: string; error?: string }>("/api/mobile/loyalty/phone-hint-login", {
+    method: "POST",
+    body: JSON.stringify({ phone }),
+  });
+}
+
 export function getGoogleEmail(accessToken: string) {
   return request<{ email?: string; error?: string }>("/api/mobile/loyalty/google-email", {
     method: "POST",
@@ -47,15 +56,19 @@ export function collectStamp(token: string, slug: string, scanToken: string | un
 }
 
 export function claimReward(token: string, slug: string) {
-  return request<{ ok?: true; stamps?: number; error?: string }>("/api/mobile/loyalty/claim", {
-    method: "POST",
-    token,
-    body: JSON.stringify({ slug }),
-  });
+  return request<{ ok?: true; code?: string; expires_at?: string; error?: string }>(
+    "/api/mobile/loyalty/claim",
+    { method: "POST", token, body: JSON.stringify({ slug }) }
+  );
+}
+
+export interface PendingRedeem {
+  code: string;
+  expires_at: string;
 }
 
 export function getCard(token: string, slug: string) {
-  return request<{ stamps: number; reward_ready: boolean; max_stamps: number }>(
+  return request<{ stamps: number; reward_ready: boolean; max_stamps: number; redeem: PendingRedeem | null }>(
     `/api/mobile/loyalty/card?slug=${encodeURIComponent(slug)}`,
     { method: "GET", token }
   );
